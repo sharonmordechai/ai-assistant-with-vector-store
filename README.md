@@ -120,3 +120,6 @@ To run the application, follow the steps below:
 This AI assistant is based on OpenAI and is designed to answer questions based on its training knowledge. Additionally, it features a document upload capability using a vector store.
 
 Please note that this is a beta tool, and any feedback is appreciated to enhance its performance.
+
+## Author
+* Sharon Mordechai.
