@@ -1,5 +1,9 @@
 # AI Assistant
 
+The Streamlit app for the AI Assistant can be found [here](https://ai-assistant-with-vector-store.streamlit.app/). You're welcome to give it a try!
+
+![](documentation/ai-assistant-demo.gif)
+
 ## Overview
 
 The AI Assistant is an intelligent conversational tool leveraging the power of OpenAI's GPT models to provide insightful and interactive responses. 
