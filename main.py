@@ -76,7 +76,7 @@ if "on_change" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "agent" not in st.session_state:
-    st.session_state.agent = initialize_agent(llm=llm, tools=[], agent="conversational-react-description", memory=memory)
+    st.session_state.agent = initialize_agent(llm=llm, tools=[], agent="conversational-react-description", memory=memory, handle_parsing_errors=lambda error: str(error)[:50])
 
 # Display chat history
 for message in st.session_state.messages:
@@ -143,10 +143,10 @@ if st.session_state.on_change:
             )
 
             # Initialize agent with the vector tool
-            st.session_state.agent = initialize_agent(llm=llm, tools=[vector_tool], agent="conversational-react-description", memory=memory)
+            st.session_state.agent = initialize_agent(llm=llm, tools=[vector_tool], agent="conversational-react-description", memory=memory, handle_parsing_errors=lambda error: str(error)[:50])
         else:
             # Initialize agent without the vector tool
-            st.session_state.agent = initialize_agent(llm=llm, tools=[], agent="conversational-react-description", memory=memory)
+            st.session_state.agent = initialize_agent(llm=llm, tools=[], agent="conversational-react-description", memory=memory, handle_parsing_errors=lambda error: str(error)[:50])
     st.session_state.on_change = False
     st.toast("Files were updated successfully.")
 
