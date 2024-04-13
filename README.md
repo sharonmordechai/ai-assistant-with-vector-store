@@ -1,5 +1,5 @@
 # AI Assistant
- 
+
 The Streamlit app for the AI Assistant can be found [here](https://ai-assistant-with-vector-store.streamlit.app/). You're welcome to give it a try!
 
 ![](documentation/ai-assistant-demo.gif)
