@@ -1,8 +1,13 @@
-import os
+# built-ins
+from pathlib import Path
+from typing import Dict, List, Protocol, Type
 
+# 3rd-party
+from langchain_community.document_loaders.base import BaseLoader
 from langchain_community.document_loaders.pdf import PyPDFLoader
 from langchain_community.document_loaders.text import TextLoader
 from langchain_community.document_loaders.word_document import Docx2txtLoader
+from langchain_core.documents import Document
 
 
 class DocumentLoader:
@@ -10,7 +15,7 @@ class DocumentLoader:
     A class to load documents of various formats and store them in a list.
 
     Attributes:
-        documents (list): A list to store the loaded documents.
+        documents: A list to store the loaded documents.
 
     Example usage:
         loader = DocumentLoader()
@@ -20,64 +25,56 @@ class DocumentLoader:
         print(loader.size())
     """
 
-    def __init__(self):
+    # A protocol to enforce the initialization of classes with a file path
+    class FileInitializedClass(Protocol):
+        def __init__(self, file_path: str, *args, **kwargs) -> None: ...
+
+    # A protocol to enforce BaseLoader classes that initialize with a file
+    class FileInitializedDocLoader(BaseLoader, FileInitializedClass):
+        pass
+
+    # A dictionary to map file suffixes to their respective loaders
+    # Sadly,
+    DOC_LOADERS: Dict[str, Type[FileInitializedDocLoader]] = {
+        ".txt": TextLoader,
+        ".pdf": PyPDFLoader,
+        ".docx": Docx2txtLoader,
+    }
+
+    def __init__(self) -> None:
         """
         Initializes an empty list to store the documents.
         """
-        self.documents = []
+        self.documents: List[Document] = []
 
-    def load(self, file_path):
+    def load(self, doc_path: Path) -> None:
         """
         Loads a document from the specified file path and appends it to the documents list.
 
         Args:
-            file_path (str): The path to the document file to be loaded.
+            doc_path: The path to the document file to be loaded.
         """
-        file_type = self.get_file_type(file_path)
-
-        if file_type == "txt":
-            # Text loader for txt files
-            loader = TextLoader(file_path)
+        file_suffix = doc_path.suffix
+        try:
+            loader: BaseLoader = DocumentLoader.DOC_LOADERS[file_suffix](str(doc_path))
             self.documents.extend(loader.load())
-        elif file_type == "pdf":
-            # PDF loader for pdf files
-            loader = PyPDFLoader(file_path)
-            self.documents.extend(loader.load())
-        elif file_type == "docx":
-            # Word loader for docx files
-            loader = Docx2txtLoader(file_path)
-            self.documents.extend(loader.load())
-        else:
-            print(f"{file_type} is not supported.")
+        except KeyError:
+            print(f"{file_suffix} is not supported.")
             return
 
-    def remove(self, file_path):
+    def remove(self, doc_path: Path) -> None:
         """
         Removes a document from the documents list based on its source path.
 
         Args:
-            file_path (str): The path of the document to be removed.
+            doc_path: The path of the document to be removed.
         """
-        filename = os.path.basename(file_path)
+        doc_filename_to_remove = doc_path.stem
         for doc in self.documents:
-            doc_filename = os.path.basename(doc.metadata.get("source"))
-            if doc_filename == filename:
+            doc_filename = Path(doc.metadata.get("source")).stem
+            if doc_filename == doc_filename_to_remove:
                 self.documents.remove(doc)
                 break
 
-    def size(self):
+    def size(self) -> int:
         return len(self.documents)
-
-    @staticmethod
-    def get_file_type(file_path):
-        """
-        Determines the file type based on the file extension.
-
-        Args:
-            file_path (str): The path to the file.
-
-        Returns:
-            str: The file type (txt, pdf, docx).
-        """
-        _, ext = os.path.splitext(file_path)
-        return ext[1:].lower()

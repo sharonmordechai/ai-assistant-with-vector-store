@@ -1,9 +1,11 @@
-import os
+# built-ins
 import tempfile
 import time
+from pathlib import Path
 
+# 3rd-party
 import streamlit as st
-from langchain.agents import initialize_agent
+from langchain.agents import AgentType, initialize_agent
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.tools.retriever import create_retriever_tool
 from langchain_community.chat_message_histories.streamlit import (
@@ -13,6 +15,7 @@ from langchain_community.vectorstores.faiss import FAISS
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+# local
 from utils.langchain_loaders import DocumentLoader
 
 # Set page title
@@ -100,7 +103,7 @@ if "agent" not in st.session_state:
     st.session_state.agent = initialize_agent(
         llm=llm,
         tools=[],
-        agent="conversational-react-description",
+        agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION,
         memory=memory,
         handle_parsing_errors=lambda error: str(error)[:50],
     )
@@ -120,11 +123,11 @@ for file in uploaded_files:
         temp_dir = tempfile.TemporaryDirectory()
 
         # Create temporary file path
-        temp_filepath = os.path.join(temp_dir.name, file.name)
+        temp_filepath = Path(temp_dir.name) / file.name
 
         # Save temporary file
-        with open(temp_filepath, "wb") as f:
-            f.write(file.getvalue())
+        with temp_filepath.open("wb") as temp_file:
+            temp_file.write(file.getvalue())
 
         # Load document
         st.session_state.loader.load(temp_filepath)
@@ -139,7 +142,7 @@ for file in st.session_state.files:
         temp_dir = tempfile.TemporaryDirectory()
 
         # Create temporary file path
-        temp_filepath = os.path.join(temp_dir.name, file.name)
+        temp_filepath = Path(temp_dir.name) / file.name
 
         # Remove this file from the session loader
         st.session_state.loader.remove(temp_filepath)
@@ -177,7 +180,7 @@ if st.session_state.on_change:
             st.session_state.agent = initialize_agent(
                 llm=llm,
                 tools=[vector_tool],
-                agent="conversational-react-description",
+                agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION,
                 memory=memory,
                 handle_parsing_errors=lambda error: str(error)[:50],
             )
@@ -186,7 +189,7 @@ if st.session_state.on_change:
             st.session_state.agent = initialize_agent(
                 llm=llm,
                 tools=[],
-                agent="conversational-react-description",
+                agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION,
                 memory=memory,
                 handle_parsing_errors=lambda error: str(error)[:50],
             )
