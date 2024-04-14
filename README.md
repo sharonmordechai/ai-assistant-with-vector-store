@@ -103,6 +103,19 @@ To run the application, follow the steps below:
     This command will start the application and execute the main.py script,
     allowing you to interact with the application.
 
+3. Setting-up and Using the Pre-Commit Linters (Optional):
+
+    ```bash
+   # Installing dev package
+   python -m pip install -r dev-requirements.txt
+
+   # Installing pre-commit hooks (after this, linters will run before commits)
+   pre-commit install
+
+   # Running pre-commit hooks manually on all files
+   pre-commit run --all-files
+   ```
+
 ---
 
 ## How to Use the AI Assistant
