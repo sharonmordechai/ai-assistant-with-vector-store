@@ -33,12 +33,12 @@ class DocumentLoader:
     class FileInitializedDocLoader(BaseLoader, FileInitializedClass):
         pass
 
-    # A dictionary to map file suffixes to their respective loaders
+    # A dictionary to map file extensions to their respective loaders
     # Sadly,
-    DOC_LOADERS: Dict[str, Type[FileInitializedDocLoader]] = {
-        ".txt": TextLoader,
-        ".pdf": PyPDFLoader,
-        ".docx": Docx2txtLoader,
+    _DOC_LOADERS: Dict[str, Type[FileInitializedDocLoader]] = {
+        "txt": TextLoader,
+        "pdf": PyPDFLoader,
+        "docx": Docx2txtLoader,
     }
 
     def __init__(self) -> None:
@@ -54,12 +54,12 @@ class DocumentLoader:
         Args:
             doc_path: The path to the document file to be loaded.
         """
-        file_suffix = doc_path.suffix
+        file_ext = doc_path.suffix[1:]
         try:
-            loader: BaseLoader = DocumentLoader.DOC_LOADERS[file_suffix](str(doc_path))
+            loader: BaseLoader = DocumentLoader._DOC_LOADERS[file_ext](str(doc_path))
             self.documents.extend(loader.load())
         except KeyError:
-            print(f"{file_suffix} is not supported.")
+            print(f"{file_ext} is not supported.")
             return
 
     def remove(self, doc_path: Path) -> None:
@@ -76,5 +76,10 @@ class DocumentLoader:
                 self.documents.remove(doc)
                 break
 
+    @property
     def size(self) -> int:
         return len(self.documents)
+
+    @staticmethod
+    def supported_doc_extensions() -> List[str]:
+        return list(DocumentLoader._DOC_LOADERS.keys())

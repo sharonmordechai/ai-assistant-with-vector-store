@@ -47,7 +47,7 @@ with st.sidebar:
     st.markdown("# Upload a file")
     uploaded_files = st.file_uploader(
         label="Support vector store capabilities based on uploaded files.",
-        type=["pdf", "docx", "txt"],
+        type=DocumentLoader.supported_doc_extensions(),
         accept_multiple_files=True,
     )
 
@@ -156,7 +156,7 @@ for file in st.session_state.files:
 # Update vector store if there are changes in files
 if st.session_state.on_change:
     with st.spinner("Uploading files..."):
-        if st.session_state.loader.size() > 0:
+        if st.session_state.loader.size > 0:
             # Split documents
             text_splitter = RecursiveCharacterTextSplitter(
                 chunk_size=1500, chunk_overlap=200
