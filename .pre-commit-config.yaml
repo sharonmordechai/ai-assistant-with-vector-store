@@ -14,7 +14,7 @@ repos:
           "--remove-all-unused-imports",
           "--in-place",
         ]
-        language_version: python3.11
+        language_version: python3.9
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.39.0
@@ -27,13 +27,13 @@ repos:
     hooks:
       - id: isort
         args: ["--profile=black"]
-        language_version: python3.11
+        language_version: python3.9
 
   - repo: https://github.com/psf/black
     rev: 24.4.0
     hooks:
       - id: black
-        language_version: python3.11
+        language_version: python3.9
 
   - repo: https://github.com/pycqa/pylint
     rev: v3.1.0
@@ -43,7 +43,7 @@ repos:
         args: [
           "--max-args=6",
         ]
-        language_version: python3.11
+        language_version: python3.9
         additional_dependencies: [
           "docx2txt==0.8",
           "faiss-cpu==1.8.0",
@@ -61,5 +61,5 @@ repos:
       - id: mypy
         entry: mypy
         verbose: true
-        language_version: python3.11
+        language_version: python3.9
         additional_dependencies: []
