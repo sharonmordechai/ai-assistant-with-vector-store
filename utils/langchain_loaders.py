@@ -1,3 +1,15 @@
+"""
+This module contains the DocumentLoader class for loading and storing documents of various
+formats.
+
+The DocumentLoader supports text, PDF, and Word documents, using loaders defined in the
+langchain_community.document_loaders module. It provides methods to load, remove, and get
+the size of the documents, and to get the list of supported document extensions.
+
+Also defined are two protocols, FileInitializedClass and FileInitializedDocLoader, for
+initializing classes with a file path and BaseLoader classes with a file, respectively.
+"""
+
 # built-ins
 from pathlib import Path
 from typing import Dict, List, Protocol, Type
@@ -25,13 +37,17 @@ class DocumentLoader:
         print(loader.size())
     """
 
-    # A protocol to enforce the initialization of classes with a file path
+    # The following protocols break pylint for being non-worthy
+    # classes (too few methods). We will disable the warning for them.
+    # pylint: disable=too-few-public-methods
+
     class FileInitializedClass(Protocol):
+        """A protocol to enforce the initialization of classes with a file path."""
+
         def __init__(self, file_path: str, *args, **kwargs) -> None: ...
 
-    # A protocol to enforce BaseLoader classes that initialize with a file
     class FileInitializedDocLoader(BaseLoader, FileInitializedClass):
-        pass
+        """A protocol to enforce BaseLoader classes that initialize with a file."""
 
     # A dictionary to map file extensions to their respective loaders
     # Sadly,
@@ -78,8 +94,10 @@ class DocumentLoader:
 
     @property
     def size(self) -> int:
+        """Size of the DocumentLoader is considered the number of documents"""
         return len(self.documents)
 
     @staticmethod
     def supported_doc_extensions() -> List[str]:
+        """Returns the list of supported document extensions"""
         return list(DocumentLoader._DOC_LOADERS.keys())

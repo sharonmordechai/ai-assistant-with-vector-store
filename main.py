@@ -1,3 +1,12 @@
+"""
+The AI Assistant is an intelligent conversational tool leveraging the power of
+OpenAI's GPT models to provide insightful and interactive responses. Built with
+Langchain for advanced agent management, memory handling, and tool creation,
+the assistant offers a seamless user experience through a Streamlit-based interface.
+
+For more information, please check README.md
+"""
+
 # built-ins
 import tempfile
 import time
@@ -17,6 +26,19 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # local
 from utils.langchain_loaders import DocumentLoader
+
+
+@st.cache_resource
+def upload_tmp_dir() -> Path:
+    """
+    Creates a temporary directory and caches its Path for the Streamlit app's lifecycle.
+    This is achieved by using the `@st.cache_resource` decorator.
+
+    Returns:
+        Path: Path to the created temporary directory.
+    """
+    return Path(tempfile.mkdtemp())
+
 
 # Set page title
 st.set_page_config(page_title="AI Assistant")
@@ -55,11 +77,14 @@ with st.sidebar:
     st.markdown("# About")
     st.markdown(
         """
-        This AI assistant is based on OpenAI and is designed to answer questions based on its training knowledge.
+        This AI assistant is based on OpenAI and is designed to answer questions based on its
+        training knowledge.
 
         Additionally, it features a document upload capability using a vector store.
 
-        Please note that this is a beta tool, and any feedback is appreciated to enhance its performance."""
+        Please note that this is a beta tool, and any feedback is appreciated to enhance its
+        performance.
+        """
     )
     st.markdown(
         "Made by [Sharon M.](https://www.linkedin.com/in/sharon-mordechai-a294b6129/)"
@@ -119,11 +144,8 @@ for file in uploaded_files:
         # Add file to the session files
         st.session_state.files.append(file)
 
-        # Create temporary directory
-        temp_dir = tempfile.TemporaryDirectory()
-
         # Create temporary file path
-        temp_filepath = Path(temp_dir.name) / file.name
+        temp_filepath = upload_tmp_dir() / file.name
 
         # Save temporary file
         with temp_filepath.open("wb") as temp_file:
@@ -138,14 +160,14 @@ for file in uploaded_files:
 # Handle file removals
 for file in st.session_state.files:
     if file not in uploaded_files:
-        # Create temporary directory
-        temp_dir = tempfile.TemporaryDirectory()
-
         # Create temporary file path
-        temp_filepath = Path(temp_dir.name) / file.name
+        temp_filepath = upload_tmp_dir() / file.name
 
         # Remove this file from the session loader
         st.session_state.loader.remove(temp_filepath)
+
+        # Remove temporary file
+        temp_filepath.unlink()
 
         # Remove this file from the session files
         st.session_state.files.remove(file)
@@ -167,13 +189,13 @@ if st.session_state.on_change:
             vector = FAISS.from_documents(documents, embeddings)
 
             # Create a vector tool for agent
-            filename_str = ", ".join(
+            FILENAME_STR = ", ".join(
                 [file.name.split(".")[0] for file in uploaded_files]
             )
             vector_tool = create_retriever_tool(
                 retriever=vector.as_retriever(),
                 name="vector-tool",
-                description=f"Useful for searching information about {filename_str}",
+                description=f"Useful for searching information about {FILENAME_STR}",
             )
 
             # Initialize agent with the vector tool
@@ -199,10 +221,15 @@ if st.session_state.on_change:
 
 # Function to stream the response for a more interactive chat experience
 def stream_response(res):
+    """Stream the response for a more interactive chat experience."""
     for word in res.split(" "):
         yield word + " "
         time.sleep(0.02)
 
+
+# The following appears also in the examples/streamlit_open_ai.py file
+# For now, we disable pylint's check for similar code in different files
+# pylint: disable=R0801
 
 # Handle user input and generate response
 if prompt := st.chat_input("Type your message here..."):
