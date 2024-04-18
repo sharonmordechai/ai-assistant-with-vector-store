@@ -50,7 +50,6 @@ class DocumentLoader:
         """A protocol to enforce BaseLoader classes that initialize with a file."""
 
     # A dictionary to map file extensions to their respective loaders
-    # Sadly,
     _DOC_LOADERS: Dict[str, Type[FileInitializedDocLoader]] = {
         "txt": TextLoader,
         "pdf": PyPDFLoader,

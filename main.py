@@ -14,7 +14,7 @@ from pathlib import Path
 
 # 3rd-party
 import streamlit as st
-from langchain.agents import AgentType, initialize_agent
+from langchain.agents import AgentExecutor, ConversationalAgent
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.tools.retriever import create_retriever_tool
 from langchain_community.chat_message_histories.streamlit import (
@@ -56,9 +56,11 @@ with st.sidebar:
     openai_api_key = st.text_input("OpenAI API Key", type="password")
 
     st.markdown("Choose OpenAI model:")
-    model_name = st.selectbox("Model", options=["gpt-4", "gpt-3.5-turbo"])
+    model_name = st.selectbox(
+        "Model", options=["gpt-3.5-turbo", "gpt-4-turbo-preview", "gpt-4"]
+    )
     temperature = st.slider(
-        "Temperature", min_value=0.0, max_value=1.0, step=0.1, value=0.2, disabled=True
+        "Temperature", min_value=0.0, max_value=1.0, step=0.1, value=0.2
     )
 
     st.markdown("\n")
@@ -125,10 +127,9 @@ if "on_change" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "agent" not in st.session_state:
-    st.session_state.agent = initialize_agent(
-        llm=llm,
+    st.session_state.agent = AgentExecutor.from_agent_and_tools(
+        agent=ConversationalAgent.from_llm_and_tools(llm=llm, tools=[]),
         tools=[],
-        agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION,
         memory=memory,
         handle_parsing_errors=lambda error: str(error)[:50],
     )
@@ -199,19 +200,19 @@ if st.session_state.on_change:
             )
 
             # Initialize agent with the vector tool
-            st.session_state.agent = initialize_agent(
-                llm=llm,
+            st.session_state.agent = AgentExecutor.from_agent_and_tools(
+                agent=ConversationalAgent.from_llm_and_tools(
+                    llm=llm, tools=[vector_tool]
+                ),
                 tools=[vector_tool],
-                agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION,
                 memory=memory,
                 handle_parsing_errors=lambda error: str(error)[:50],
             )
         else:
             # Initialize agent without the vector tool
-            st.session_state.agent = initialize_agent(
-                llm=llm,
+            st.session_state.agent = AgentExecutor.from_agent_and_tools(
+                agent=ConversationalAgent.from_llm_and_tools(llm=llm, tools=[]),
                 tools=[],
-                agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION,
                 memory=memory,
                 handle_parsing_errors=lambda error: str(error)[:50],
             )
