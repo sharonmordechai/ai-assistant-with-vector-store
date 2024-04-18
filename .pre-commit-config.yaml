@@ -14,7 +14,7 @@ repos:
           "--remove-all-unused-imports",
           "--in-place",
         ]
-        language_version: python3.9
+        language_version: python3.11
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.39.0
