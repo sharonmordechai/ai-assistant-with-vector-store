@@ -56,7 +56,9 @@ with st.sidebar:
     openai_api_key = st.text_input("OpenAI API Key", type="password")
 
     st.markdown("Choose OpenAI model:")
-    model_name = st.selectbox("Model", options=["gpt-4", "gpt-3.5-turbo"])
+    model_name = st.selectbox(
+        "Model", options=["gpt-3.5-turbo", "gpt-4-turbo-preview", "gpt-4"]
+    )
     temperature = st.slider(
         "Temperature", min_value=0.0, max_value=1.0, step=0.1, value=0.2, disabled=True
     )
