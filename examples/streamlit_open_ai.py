@@ -1,3 +1,11 @@
+"""
+This scripts is an example which demonstrates a simple chat interface using the OpenAI GPT models
+in a Streamlit app. Users can interact with the chat interface and receive responses from the
+selected GPT model.
+
+For more information, please check examples/README.md
+"""
+
 import streamlit as st
 from openai import OpenAI
 
@@ -41,6 +49,11 @@ if prompt := st.chat_input("Type your message here..."):
 
     # Get the assistant's response from OpenAI
     with st.chat_message("assistant"):
+        # Both PyCharm's code-inspection and pylint will complain
+        # about the following lines of code, so, we disable those
+        # noinspection PyTypeChecker
+        # pylint: disable=invalid-name
+
         # Create a chat completion stream using the OpenAI API
         stream = client.chat.completions.create(
             model=model_name,
@@ -50,6 +63,7 @@ if prompt := st.chat_input("Type your message here..."):
             ],
             stream=True,
         )
+
         # Write the assistant's response to the chat
         response = st.write_stream(stream)
 

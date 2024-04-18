@@ -1,1 +1,17 @@
-.idea
+# PyCharm Projects
+.idea/
+
+# vscode
+.vscode
+
+# pyenv
+.python-version
+
+# Common venvs
+venv*/
+.venv*/
+
+# Python stuff - byte-compiled & optimized files
+__pycache__/
+*.py[cod]
+*$py.class
