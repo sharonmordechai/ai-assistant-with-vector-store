@@ -62,34 +62,44 @@ class DocumentLoader:
         """
         self.documents: List[Document] = []
 
-    def load(self, doc_path: Path) -> None:
+    def load(self, doc_path: Path) -> bool:
         """
         Loads a document from the specified file path and appends it to the documents list.
 
         Args:
             doc_path: The path to the document file to be loaded.
+
+        Returns:
+            True if the document was successfully loaded, False otherwise.
         """
         file_ext = doc_path.suffix[1:]
         try:
             loader: BaseLoader = DocumentLoader._DOC_LOADERS[file_ext](str(doc_path))
             self.documents.extend(loader.load())
+            return True
         except KeyError:
             print(f"{file_ext} is not supported.")
-            return
+            return False
 
-    def remove(self, doc_path: Path) -> None:
+    def remove(self, doc_path: Path) -> bool:
         """
         Removes a document from the documents list based on its source path.
 
         Args:
             doc_path: The path of the document to be removed.
+
+        Returns:
+            True if the document was successfully removed, False otherwise.
         """
+        found_doc = False
         doc_filename_to_remove = doc_path.stem
         for doc in self.documents:
             doc_filename = Path(doc.metadata.get("source")).stem
             if doc_filename == doc_filename_to_remove:
                 self.documents.remove(doc)
+                found_doc = True
                 break
+        return found_doc
 
     @property
     def size(self) -> int:
